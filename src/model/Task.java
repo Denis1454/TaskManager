@@ -1,6 +1,7 @@
 package model;
 
 import model.enums.Status;
+import model.enums.Types;
 
 import java.util.Objects;
 
@@ -10,20 +11,20 @@ public class Task {
     private int id;
     private Status status;
 
-    private String type;
+    private Types type;
 
-    public Task(String name, String description, Status status, String type) {
+    public Task(String name, String description, Status status, Types type) {
         this.name = name;
         this.description = description;
         this.status = status;
         this.type = type;
     }
 
-    public String getType() {
+    public Types getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Types type) {
         this.type = type;
     }
 

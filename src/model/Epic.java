@@ -1,14 +1,15 @@
 package model;
 
 import model.enums.Status;
+import model.enums.Types;
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
 
 public class Epic extends Task {
     private HashMap<Integer,Subtask> subtasks = new HashMap<>();
 
-    public Epic(String name, String description, Status status, String type) {
+    public Epic(String name, String description, Status status, Types type) {
         super(name, description, status, type);
     }
 
