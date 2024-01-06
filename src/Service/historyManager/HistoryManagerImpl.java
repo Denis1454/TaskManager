@@ -2,7 +2,10 @@ package Service.historyManager;
 
 import model.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class HistoryManagerImpl implements HistoryManager {
 
@@ -20,9 +23,10 @@ public class HistoryManagerImpl implements HistoryManager {
         }
         return task;
     }
+
     @Override
     public void addToHistory(Task task) {
-        if(nods.containsKey(task.getId())) {
+        if (nods.containsKey(task.getId())) {
             remove(task.getId());
             linkLast(task);
         } else {

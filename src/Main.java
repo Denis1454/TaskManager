@@ -3,8 +3,6 @@ import model.Epic;
 import model.Subtask;
 import model.Task;
 
-import java.util.List;
-
 import static model.enums.Status.NEW;
 import static model.enums.Types.*;
 
@@ -39,9 +37,9 @@ public class Main {
         taskManager.getById(2);
         taskManager.getById(3);
         taskManager.getById(4);
-        List<Task> history = taskManager.historyManager.getHistory();
-        for (Task task2 : history) {
-            System.out.println(task2);
-        }
+        //List<Task> history = taskManager.historyManager.getHistory();
+        //for (Task task2 : history) {
+        //    System.out.println(task2);
+        //}
     }
 }

@@ -20,6 +20,14 @@ public class Task {
         this.type = type;
     }
 
+    public Task(String name, String description, int id, Status status, Types type) {
+        this.name = name;
+        this.description = description;
+        this.id = id;
+        this.status = status;
+        this.type = type;
+    }
+
     public Types getType() {
         return type;
     }
@@ -76,11 +84,11 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
+                "id=" + id +
+                ", name=" + name +
+                ", description=" + description +
                 ", status=" + status +
-                ", type='" + type + '\'' +
+                ", type=" + type +
                 '}';
     }
 }
