@@ -18,9 +18,14 @@ import static util.Managers.getDefaultHistoryManager;
 public class TaskManagerImpl implements TaskManager {
     final HistoryManager historyManager = getDefaultHistoryManager();
     final Map<Integer, Task> dateBase = new HashMap<>();
-    private int count = 0;
+    static int count = 0;
 
     public static final String ERROR_NOT_FOUND_ID = "Несуществует задачи с веденым id";
+
+    @Override
+    public List<Task> getAllTask() {
+        return dateBase.values().stream().toList();
+    }
 
     @Override
     public void saveTask(Task task) {
@@ -145,7 +150,9 @@ public class TaskManagerImpl implements TaskManager {
     private void generateId() {
         count++;
     }
-
+    static void setId(int id) {
+        TaskManagerImpl.count = id;
+    }
     protected HistoryManager getHistoryManager() {
         return historyManager;
     }

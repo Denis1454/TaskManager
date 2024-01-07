@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.List;
 
 public interface TaskManager {
+
+    List<Task> getAllTask();
     void saveTask(Task task) throws IOException;
 
     void removeTaskById(int id) throws IOException;

@@ -11,14 +11,27 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import static model.enums.Status.NEW;
+import static model.enums.Types.*;
 
 public class FileBackedTasksManager extends TaskManagerImpl {
     private final File file;
 
     public FileBackedTasksManager(File file) {
         this.file = file;
+    }
+
+    @Override
+    public List<Task> getAllTask() {
+        List<Task> allTask = super.getAllTask();
+        save();
+        return allTask;
     }
 
     @Override
@@ -68,7 +81,6 @@ public class FileBackedTasksManager extends TaskManagerImpl {
 
     protected HistoryManager getHistoryManager() {
         return super.getHistoryManager();
-
     }
 
     public void save() {
@@ -78,6 +90,7 @@ public class FileBackedTasksManager extends TaskManagerImpl {
             bufferedWriter.newLine();
             for (Task task : dateBase.values()) {
                 bufferedWriter.write(task.toString());
+                bufferedWriter.newLine();
             }
             bufferedWriter.newLine();
             bufferedWriter.write(historyToString(historyManager));
@@ -103,21 +116,17 @@ public class FileBackedTasksManager extends TaskManagerImpl {
 
     static List<Integer> historyFromString(String value) {
         List<Integer> tasksIds = new ArrayList<>();
-
+        String[] history = value.split(",");
+        for (String id : history) {
+            tasksIds.add(Integer.parseInt(id.trim()));
+        }
         return tasksIds;
     }
 
-    public Task fromString(String value) {
+    static Task fromString(String value) {
         String[] split = value.split(",");
         int id = Integer.parseInt(split[0].trim());
         switch (Types.valueOf(split[4].trim())) {
-            case TASK -> {
-                return new Task(split[1].trim(),
-                        split[2].trim(),
-                        id,
-                        Status.valueOf(split[3].trim()),
-                        Types.valueOf(split[4].trim()));
-            }
             case EPIC -> {
                 return new Epic(split[1].trim(),
                         split[2].trim(),
@@ -133,8 +142,93 @@ public class FileBackedTasksManager extends TaskManagerImpl {
                         Types.valueOf(split[4].trim()),
                         Integer.parseInt(split[5].trim()));
             }
+            default -> {
+                return new Task(split[1].trim(),
+                        split[2].trim(),
+                        id,
+                        Status.valueOf(split[3].trim()),
+                        Types.valueOf(split[4].trim()));
+            }
         }
-        return null;
     }
 
+    static FileBackedTasksManager loadFromFile(File file) throws ManagerLoadException {
+        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
+        try {
+            List<String> lines = Files.readAllLines(Path.of(file.getAbsolutePath()));
+            lines.remove(0);
+            for (String line : lines) {
+                if (!(line.isEmpty())) {
+                    Task task = fromString(line);
+                    fileBackedTasksManager.dateBase.put(task.getId(), task);
+                    setId(task.getId());
+                } else {
+                    break;
+                }
+            }
+            String lastLine = lines.get(lines.size() - 1);
+            for (Integer id : historyFromString(lastLine)) {
+                fileBackedTasksManager.historyManager.addToHistory(fileBackedTasksManager.dateBase.get(id));
+            }
+        } catch (IOException e) {
+            throw new ManagerLoadException("Не можем загрузить файл " + file.getName(), e);
+        }
+        return fileBackedTasksManager;
+    }
+
+    public static void main(String[] args) throws IOException, ManagerLoadException {
+        Path src = Paths.get("src", "File.cvs");
+        Path path;
+
+        if (Files.exists(src)) {
+            Files.delete(src);
+            path = Files.createFile(src);
+        } else {
+            path = null;
+        }
+        FileBackedTasksManager manager = new FileBackedTasksManager(path.toFile());
+
+
+        Task task = new Task("Денис", "Ремонт", NEW, TASK);
+
+        manager.saveTask(task);
+
+        manager.getById(task.getId());
+
+
+        Task task1 = new Task("Аня", "Уборка", NEW, TASK);
+
+        manager.saveTask(task1);
+
+        manager.getById(task1.getId());
+
+
+        Epic epic = new Epic("Катя", "Стирка", NEW, EPIC);
+        manager.saveTask(epic);
+
+
+        Subtask subtask = new Subtask("Дима", "Отпуск", NEW, SUBTASK, 2);
+
+        Subtask subtask1 = new Subtask("Рома", "Отдых", NEW, SUBTASK, 2);
+        manager.saveTask(subtask);
+
+        manager.saveTask(subtask1);
+
+
+        FileBackedTasksManager manager2 = loadFromFile(path.toFile());
+
+        for (Task task3 : manager2.getHistoryManager().getHistory()) {
+
+            System.out.println(task3);
+
+        }
+
+        System.out.println("------------------------");
+
+
+        for (Task task4 : manager2.getAllTask()) {
+
+            System.out.println(task4);
+        }
+    }
 }
